@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './db/db.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/userRoutes.js"
+import productRoutes from "./routes/productRoutes.js"
 dotenv.config();
 
 const app = express();
@@ -14,9 +15,11 @@ connectDB();
 // Middleware
 app.use(express.json());
 
+
 // Routes
 app.use('/auth', authRoutes);
 app.use("/users", userRoutes)
+app.use("/products", productRoutes);
 
 // Start server
 app.listen(PORT, () => {
