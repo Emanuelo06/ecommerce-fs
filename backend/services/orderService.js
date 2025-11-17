@@ -24,10 +24,13 @@ export const getOrder = async (orderId) => {
 };
 
 export const updateOrder = async (orderId, orderData) => {
-  const updated = await Order.findByIdAndUpdate(orderId, orderData, { new: true });
-  if (!updated) throw new Error("Order not found");
-  return updated;
+  const order = await Order.findById(orderId);
+  if (!order) throw new Error("Order not found");
+  Object.assign(order, orderData);
+  await order.save();
+  return order;
 };
+
 
 export const deleteOrder = async (orderId) => {
   const deleted = await Order.findByIdAndDelete(orderId);

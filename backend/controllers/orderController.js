@@ -44,3 +44,53 @@ export const getOrders = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "pending",
+      "paid",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+      "refunded",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    const order = await orderService.getOrder(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const statusTransitions = {
+      pending: ["paid", "cancelled"],
+      paid: ["processing", "cancelled", "refunded"],
+      processing: ["shipped", "cancelled"],
+      shipped: ["delivered", "refunded"],
+      delivered: [],
+      cancelled: [],
+      refunded: [],
+    };
+
+    const currentStatus = order.status;
+
+    if (!statusTransitions[currentStatus].includes(status)) {
+      return res.status(400).json({
+        message: `Cannot change status from '${currentStatus}' to '${status}'`,
+      });
+    }
+
+    const updatedOrder = await orderService.updateOrder(orderId, { status });
+
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

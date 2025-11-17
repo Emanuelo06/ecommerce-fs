@@ -6,13 +6,16 @@ export const getUser = async (userId) => {
   if (!user) throw new Error("User not found")
   return user
 }
+export const getUsers = async () => {
+  const users = await User.find().select("-password");
+  if (users.length === 0) throw new Error("No users found");
+  return users;
+}
 
 export const updateUser = async (userId, updateData) => {
-  // Only allow these fields to be updated
   const allowedFields = ["username", "address", "phoneNumber"];
   const filteredData = {};
 
-  // Build the filtered data
   for (const field of allowedFields) {
     if (updateData[field] !== undefined) {
       filteredData[field] = updateData[field];
@@ -24,7 +27,6 @@ export const updateUser = async (userId, updateData) => {
     throw new Error("No valid fields to update");
   }
 
-  // Perform the update
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: filteredData },

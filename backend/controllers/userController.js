@@ -8,8 +8,15 @@ export const getUser = async (req, res) => {
     } catch(error){
         res.status(400).json({ message: error.message });
     }
-  
-  
+}
+
+export const getUsers = async (req,res) => {
+  try{
+    const users = await userService.getUsers();
+    res.status(200).json(users);
+  } catch(error){
+    res.status(400).json({ message: error.message });
+  }
 }
 
 export const updateUser = async (req, res) => {
