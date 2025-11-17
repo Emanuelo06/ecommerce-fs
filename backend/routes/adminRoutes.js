@@ -1,7 +1,7 @@
 import express from "express";
-import productController from "../controllers/productController.js";
-import userController from "../controllers/userController.js";
-import orderController from "../controllers/orderController.js";
+import * as productController from "../controllers/productController.js";
+import * as userController from "../controllers/userController.js";
+import * as orderController from "../controllers/orderController.js";
 const router = express.Router();
 
 //admin product routes

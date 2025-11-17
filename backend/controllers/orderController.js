@@ -94,3 +94,16 @@ export const updateOrderStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const cancelOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+    const isAdmin = req.user.role === "admin";
+
+    const updatedOrder = await orderService.cancelOrder(orderId, userId, isAdmin);
+    res.status(200).json(updatedOrder);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

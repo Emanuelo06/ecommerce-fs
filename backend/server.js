@@ -5,8 +5,8 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/userRoutes.js"
 import productRoutes from "./routes/productRoutes.js"
 import orderRoutes from "./routes/orderRoute.js"
-import isAuth  from "../middlewares/isAuth.js"
-import isAdmin from '../middlewares/isAdmin.js';
+import {isAuth}  from "./middlewares/isAuth.js"
+import {isAdmin} from './middlewares/isAdmin.js';
 import adminRoutes from './routes/adminRoutes.js';
 dotenv.config();
 

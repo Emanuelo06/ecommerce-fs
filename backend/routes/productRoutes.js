@@ -1,9 +1,20 @@
 import express from "express"
-import isAdmin from "../middlewares/isAdmin.js"
+import {z} from "zod"
+import {isAdmin} from "../middlewares/isAdmin.js"
+import {validate} from "../middlewares/validate.js"
+import * as productController from "../controllers/productController.js"
+import {createProductSchema} from "../validation/productValidation.js"
+import {updateProductSchema} from "../validation/productValidation.js"
 const router = express.Router()
 
-router.get("/", productsController.getProducts)
-router.get("/:id", productsController.getProduct)
-router.post("/",isAdmin, productsController.createProduct)
-router.put("/:id",isAdmin, productsController.updateProduct)
-router.delete("/:id",isAdmin, productsController.deleteProduct)
+const productIdParamSchema = z.object({
+  id: z.string().length(24, "Invalid MongoDB ObjectId")
+});
+
+router.get("/", productController.getProducts)
+router.get("/:id",validate(productIdParamSchema, "params"), productController.getProduct)
+router.post("/",isAdmin,validate(createProductSchema), productController.createProduct)
+router.put("/:id",isAdmin,validate(productIdParamSchema, "params"),validate(updateProductSchema), productController.updateProduct)
+router.delete("/:id",isAdmin,validate(productIdParamSchema, "params"), productController.deleteProduct)
+
+export default router
