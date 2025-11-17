@@ -3,10 +3,9 @@ import dotenv from 'dotenv';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { connectDB } from './db/db.js';
 import helmet from 'helmet';
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean"
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/userRoutes.js"
+import cartRoutes from "./routes/cartRoutes.js"
 import productRoutes from "./routes/productRoutes.js"
 import orderRoutes from "./routes/orderRoute.js"
 import {isAuth}  from "./middlewares/isAuth.js"
@@ -25,15 +24,15 @@ connectDB();
 app.use(express.json());
 app.use(apiLimiter);
 app.use(helmet());
-app.use(mongoSanitize());
-app.use(xss());
 
 // Routes
 app.use('/auth', authRoutes);
 app.use("/users",isAuth, userRoutes)
 app.use("/products", productRoutes);
 app.use("/orders",isAuth, orderRoutes);
+app.use("/cart", isAuth, cartRoutes)
 app.use("/admin", isAuth, isAdmin, adminRoutes);
+
 
 app.use(errorHandler);
 
