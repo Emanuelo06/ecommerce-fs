@@ -1,7 +1,7 @@
 import Cart from "../db/models/Cart.js"
 import Product from '../db/models/Product.js';
 
-const calculateTotal = (cart) => {
+export const calculateTotal = (cart) => {
     cart.total = cart.items.reduce((sum, item) => {
         return sum + item.priceSnapshot * item.quantity;
     }, 0);

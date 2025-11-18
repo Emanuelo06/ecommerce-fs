@@ -11,6 +11,7 @@ import orderRoutes from "./routes/orderRoute.js"
 import {isAuth}  from "./middlewares/isAuth.js"
 import {isAdmin} from './middlewares/isAdmin.js';
 import adminRoutes from './routes/adminRoutes.js';
+import paymentRoutes from "./routes/paymentRoutes.js"
 import { apiLimiter } from "./middlewares/rateLimiter.js";
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/products", productRoutes);
 app.use("/orders",isAuth, orderRoutes);
 app.use("/cart", isAuth, cartRoutes)
 app.use("/admin", isAuth, isAdmin, adminRoutes);
+app.use("/payments", paymentRoutes)
 
 
 app.use(errorHandler);
