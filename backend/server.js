@@ -28,12 +28,12 @@ app.use(helmet());
 
 // Routes
 app.use('/auth', authRoutes);
-app.use("/users",isAuth, userRoutes)
+app.use("/users",isAuth, userRoutes);
 app.use("/products", productRoutes);
 app.use("/orders",isAuth, orderRoutes);
-app.use("/cart", isAuth, cartRoutes)
+app.use("/cart", isAuth, cartRoutes);
 app.use("/admin", isAuth, isAdmin, adminRoutes);
-app.use("/payments", paymentRoutes)
+app.use("/payments", paymentRoutes);
 
 
 app.use(errorHandler);
