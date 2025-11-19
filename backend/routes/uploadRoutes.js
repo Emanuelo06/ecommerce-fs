@@ -1,15 +1,18 @@
 import express from "express"
 import upload from "../middlewares/upload"
-import { uploadProductImages } from "../controllers/uploadController"
+import { removeProductImage, uploadProductImages } from "../controllers/uploadController"
 import {isAuth} from "../middlewares/isAuth.js"
+import {isAdmin} from "../middlewares/isAdmin.js"
 
 const router = express.Router();
 
 router.post(
-    "/product/:id/images",
+    "/images",
     isAuth,
     upload.array("images", 5),
     uploadProductImages
 );
+
+router.delete("/images", isAuth, isAdmin, removeProductImage);
 
 export default router
