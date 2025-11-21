@@ -46,3 +46,12 @@ export const deleteProduct = async(req, res) => {
         res.status(400).json({message: error.message})
     }
 }
+
+export const queryProducts = async (req, res) => {
+    try{
+        const result = await productService.queryProduct(req.query);
+        res.status(200).json(result)
+    } catch(error){
+        res.status(400).json({message: error.message})
+    }
+}

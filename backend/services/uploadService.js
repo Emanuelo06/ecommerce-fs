@@ -1,5 +1,5 @@
-import Product from "../db/models/Product";
-import cloudinary from "../config/cloudinary";
+import Product from "../db/models/Product.js";
+import cloudinary from "../config/cloudinary.js";
 
 
 

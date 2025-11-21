@@ -1,4 +1,4 @@
-import { addProductImages, deleteProductImage } from "../services/uploadService";
+import { addProductImages, deleteProductImage } from "../services/uploadService.js";
 
 export const uploadProductImages = async ( req, res) => {
     try{

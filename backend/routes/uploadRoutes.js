@@ -1,6 +1,6 @@
 import express from "express"
-import upload from "../middlewares/upload"
-import { removeProductImage, uploadProductImages } from "../controllers/uploadController"
+import upload from "../middlewares/upload.js"
+import { removeProductImage, uploadProductImages } from "../controllers/uploadController.js"
 import {isAuth} from "../middlewares/isAuth.js"
 import {isAdmin} from "../middlewares/isAdmin.js"
 

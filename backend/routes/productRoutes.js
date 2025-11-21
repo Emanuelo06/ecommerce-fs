@@ -12,7 +12,7 @@ const productIdParamSchema = z.object({
   id: z.string().length(24, "Invalid MongoDB ObjectId")
 });
 
-router.get("/", productController.getProducts)
+router.get("/", productController.queryProducts)
 router.get("/:id",validate(productIdParamSchema, "params"), productController.getProduct)
 router.post("/",isAdmin,validate(createProductSchema), productController.createProduct)
 router.put("/:id",isAdmin,validate(productIdParamSchema, "params"),validate(updateProductSchema), productController.updateProduct)
