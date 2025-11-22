@@ -54,3 +54,68 @@ export const cancelOrder = async (orderId, userId, isAdmin = false) => {
   await order.save();
   return order;
 };
+
+
+export const queryOrders =  async (query, userId = null, isAdmin = false) => {
+  const page = Math.max(1, Number(query.page) || 1);
+  const maxLimit = 100;
+  const defaultLimit = 10;
+  const limit = Math.min(maxLimit, Math.max(1, Number(query.limit) || defaultLimit));
+  const skip = (page - 1) * limit;
+
+  const filters = {};
+  
+  // Non-admin users can only see their own orders
+  if (!isAdmin && userId) {
+    filters.userId = userId;
+  }
+  
+  if (query.status) {
+    filters.status = query.status;
+  }
+
+  if(query.minPrice || query.maxPrice){
+    filters.totalAmount = {};
+    if(query.minPrice){
+      filters.totalAmount.$gte = Number(query.minPrice);
+    }
+    if(query.maxPrice){
+      filters.totalAmount.$lte = Number(query.maxPrice);
+    }
+  }
+
+  if(query.from ||  query.to){
+    filters.createdAt = {};
+    if(query.from){
+      filters.createdAt.$gte = new Date(query.from);
+    }
+    if(query.to){
+      filters.createdAt.$lte = new Date(query.to);
+    }
+  }
+
+  let sort = {};
+  if(query.sort){
+    const order = query.order === "asc" ? 1 : -1;
+    sort[query.sort] = order;
+  } else {
+    sort.createdAt = -1;
+  }
+
+  const orders = await Order.find(filters)
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Order.countDocuments(filters);
+
+  return {
+    orders,
+    page,
+    totalPages: Math.ceil(total / limit),
+    total,
+    limit,
+    results: orders.length
+  };
+  
+}

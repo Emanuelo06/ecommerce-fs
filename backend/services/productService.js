@@ -3,7 +3,7 @@ import Product from "../db/models/Product.js"
 
 export const getProducts = async ()=> {
     const products = await Product.find()
-    if(products.lenght === 0){
+    if(products.length === 0){
      throw new Error("No products Available")
     }
     return products
@@ -39,8 +39,10 @@ export const deleteProduct = async (productId) => {
 
 export const queryProduct = async (query) => {
     
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 20;
+    const page = Math.max(1, Number(query.page) || 1);
+    const maxLimit = 100;
+    const defaultLimit = 20;
+    const limit = Math.min(maxLimit, Math.max(1, Number(query.limit) || defaultLimit));
     const skip = (page -1) * limit;
 
     const filters = {}
@@ -49,14 +51,14 @@ export const queryProduct = async (query) => {
     }
     if(query.minPrice || query.maxPrice){
         filters.price = {};
-        if(query.minPrice) filters.price = Number(query.minPrice);
-        if(query.maxPrice) filters.price = Number(query.maxPrice)
+        if(query.minPrice) filters.price.$gte = Number(query.minPrice);
+        if(query.maxPrice) filters.price.$lte = Number(query.maxPrice);
     }
 
     if(query.search){
         filters.$or = [
-            {name: {$regex: querySearch, $options: "i"}},
-            {description: {$regex: querySearch, $options: "i"}},
+            {title: {$regex: query.search, $options: "i"}},
+            {description: {$regex: query.search, $options: "i"}},
         ];
     }
 

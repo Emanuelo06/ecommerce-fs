@@ -47,14 +47,15 @@ export const addItem = async (userId, productId, quantity) => {
 }
 
 
-export const updateItemQuantity = async ( userId,itemId, quantity)=> {
+export const updateItemQuantity = async ( userId,productId, quantity)=> {
     const cart  = await getOrCreateCart(userId);
-    const item = cart.items.id(itemId);
-    if(!item) throw new Error("Item not found");
+    const item = cart.items.find((item) => item.productId.toString() === productId);
+    if(!item) throw new Error("Item not found in cart");
 
     if(quantity < 1) throw new Error("Quantity must be at least 1");
 
-    const product =  await Product.findById(item.productId);
+    const product =  await Product.findById(productId);
+    if(!product) throw new Error("Product not found");
     if(product.stock < quantity){
         throw new Error("Not enough stock");
     }
@@ -66,10 +67,10 @@ export const updateItemQuantity = async ( userId,itemId, quantity)=> {
 }
 
 
-export const removeItem = async(userId, itemId) => {
+export const removeItem = async(userId, productId) => {
     const cart = await getOrCreateCart(userId);
 
-    cart.items = cart.items.filter((item) => item._id.toString() !== itemId);
+    cart.items = cart.items.filter((item) => item.productId.toString() !== productId);
 
     calculateTotal(cart);
     await cart.save()

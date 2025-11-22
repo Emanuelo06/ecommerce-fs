@@ -16,7 +16,9 @@ export const getProduct = async (req, res) => {
         const product = await productService.getProduct(productId)
         res.status(200).json(product)
     } catch (error){
-        res.status(404).json({message: error.message})
+        // Product not found should be 404, other errors might be 400
+        const statusCode = error.message.includes("not found") ? 404 : 400;
+        res.status(statusCode).json({message: error.message})
     }
 }
 
@@ -40,7 +42,7 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async(req, res) => {
     try{
         const productId = req.params.id
-        const deleteProduct = productService.deleteProduct(productId)
+        await productService.deleteProduct(productId)
         res.status(200).json({message: "Product deleted successfully"})
     } catch (error) {
         res.status(400).json({message: error.message})

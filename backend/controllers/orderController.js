@@ -14,7 +14,8 @@ export const getOrder = async (req, res) => {
     const order = await orderService.getOrder(req.params.id);
     res.status(200).json(order);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    const statusCode = error.message.includes("not found") ? 404 : 400;
+    res.status(statusCode).json({ message: error.message });
   }
 };
 
@@ -23,7 +24,8 @@ export const updateOrder = async (req, res) => {
     const updatedOrder = await orderService.updateOrder(req.params.id, req.body);
     res.status(200).json(updatedOrder);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    const statusCode = error.message.includes("not found") ? 404 : 400;
+    res.status(statusCode).json({ message: error.message });
   }
 };
 
@@ -32,7 +34,8 @@ export const deleteOrder = async (req, res) => {
     await orderService.deleteOrder(req.params.id);
     res.status(200).json({ message: "Order deleted successfully" });
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    const statusCode = error.message.includes("not found") ? 404 : 400;
+    res.status(statusCode).json({ message: error.message });
   }
 };
 
@@ -106,4 +109,16 @@ export const cancelOrder = async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+};
+
+
+export const queryOrders = async (req, res) => {
+  try {
+    const userId = req.user?.id || null;
+    const isAdmin = req.user?.role === "admin" || false;
+    const orders = await orderService.queryOrders(req.query, userId, isAdmin);   
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  } 
 };

@@ -14,7 +14,7 @@ const orderIdParamSchema = z.object({
 
 
 router.get("/:id",validate(orderIdParamSchema, "params"), orderController.getOrder);
-router.get("/", orderController.getOrders);
+router.get("/", orderController.queryOrders);
 router.post("/", validate(createOrderSchema), orderController.createOrder);
 router.put("/:id",isAdmin,validate(orderIdParamSchema, "params"),validate(updateOrderSchema), orderController.updateOrder);
 router.delete("/:id",validate(orderIdParamSchema, "params"), orderController.deleteOrder);

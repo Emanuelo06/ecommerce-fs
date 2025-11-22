@@ -20,6 +20,7 @@ router.delete("/items/:productId",
 router.post(
     "/merge",
     validate(mergeCartSchema), 
+    cartController.mergeCart
 );
 
 router.delete("/", cartController.clearCart);

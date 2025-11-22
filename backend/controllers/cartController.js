@@ -3,7 +3,7 @@ import * as cartService from '../services/cartService.js';
 
 export const getCart = async (req,res) => {
     try{
-        const userId = req.params.userId;
+        const userId = req.user.id;
         const cart = await cartService.getOrCreateCart(userId);
         res.status(200).json(cart)
     } catch (error) {
