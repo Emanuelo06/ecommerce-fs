@@ -5,7 +5,6 @@ import * as cartController from '../controllers/cartController.js';
 const router = express.Router();
 
 router.get("/", cartController.getCart);
-
 router.post("/items", validate(addItemSchema), cartController.addToCart)
 router.put("/items/:productId",  
     validate(productIdParamSchema, "params"), 
@@ -16,13 +15,11 @@ router.delete("/items/:productId",
     validate(productIdParamSchema, "params"),
     cartController.removeCartItem
 );
-
 router.post(
     "/merge",
     validate(mergeCartSchema), 
     cartController.mergeCart
 );
-
 router.delete("/", cartController.clearCart);
 
 export default router;

@@ -11,4 +11,4 @@ router.post(
 
 router.post("/create-payment-intent", isAuth, createPaymentIntentController);
 
-export default router
+export default router;

@@ -13,18 +13,29 @@ import {isAdmin} from './middlewares/isAdmin.js';
 import adminRoutes from './routes/adminRoutes.js';
 import paymentRoutes from "./routes/paymentRoutes.js"
 import { apiLimiter } from "./middlewares/rateLimiter.js";
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger.js';
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+export default app;
 
-// Connect to database
-connectDB();
+// Connect to database (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // Middleware
 app.use(express.json());
 app.use(apiLimiter);
 app.use(helmet());
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'E-Commerce API Documentation'
+}));
 
 // Routes
 app.use('/auth', authRoutes);
@@ -38,7 +49,11 @@ app.use("/payments", paymentRoutes);
 
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-});
+// Start server (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+  });
+}
+
+
