@@ -34,11 +34,11 @@
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   example: User registered successfully
  *                 user:
  *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
  *         description: Registration failed
  *         content:

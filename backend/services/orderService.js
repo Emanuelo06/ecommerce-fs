@@ -65,7 +65,7 @@ export const queryOrders =  async (query, userId = null, isAdmin = false) => {
 
   const filters = {};
   
-  // Non-admin users can only see their own orders
+  
   if (!isAdmin && userId) {
     filters.userId = userId;
   }
