@@ -1,6 +1,7 @@
 import axios from 'axios';
 import User from '../types/User';
-const API_URL = "https://localhost:5000/auth";
+import { API_BASE_URL } from './apiConfig';
+const API_URL = `${API_BASE_URL}/auth`;
 
 interface LoginData {
     password: string;
@@ -13,12 +14,16 @@ interface RegisterData {
 }
 
 
-export const login = async (data: LoginData) : Promise<{ token: string; user: User }> => {
+export const login = async (
+  data: LoginData
+): Promise<{ token: string; user: User }> => {
   const res = await axios.post(`${API_URL}/login`, data);
-  return res.data; 
+  return res.data;
 };
 
-export const register = async (data: RegisterData): Promise<{ token: string; user: User }>=> {
+export const register = async (
+  data: RegisterData
+): Promise<{ token: string; user: User }> => {
   const res = await axios.post(`${API_URL}/register`, data);
-  return res.data; 
+  return res.data;
 };

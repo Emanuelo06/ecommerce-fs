@@ -1,9 +1,29 @@
 import axios from 'axios';
-const API_URL = "https://localhost:5000/products";
 import  Product  from '../types/Product';
+import { API_BASE_URL } from './apiConfig';
+import { authHeaders } from './authHeaders';
 
-export const getAllProducts = async () => axios.get(API_URL).then(response => response.data);
-export const getProductById = async (productId: string) => axios.get(`${API_URL}/${productId}`).then(response => response.data);
-export const createProduct = async (productData: Product )=> axios.post(API_URL, productData).then(response => response.data);
-export const updateProduct = async (productId: string, productData: Partial<Product>) => axios.put(`${API_URL}/${productId}`, productData).then(response => response.data);
-export const deleteProduct = async (productId: string) => axios.delete(`${API_URL}/${productId}`).then(response => response.data);
+const API_URL = `${API_BASE_URL}/products`;
+
+export const getAllProducts = async () =>
+  axios.get(API_URL).then((response) => response.data);
+
+export const getProductById = async (productId: string) =>
+  axios.get(`${API_URL}/${productId}`).then((response) => response.data);
+
+export const createProduct = async (productData: Product, token: string) =>
+  axios.post(API_URL, productData, authHeaders(token)).then((response) => response.data);
+
+export const updateProduct = async (
+  productId: string,
+  productData: Partial<Product>,
+  token: string
+) =>
+  axios
+    .put(`${API_URL}/${productId}`, productData, authHeaders(token))
+    .then((response) => response.data);
+
+export const deleteProduct = async (productId: string, token: string) =>
+  axios
+    .delete(`${API_URL}/${productId}`, authHeaders(token))
+    .then((response) => response.data);
