@@ -1,12 +1,22 @@
 import axios from 'axios';
-import  Product  from '../types/Product';
+import Product from '../types/Product';
 import { API_BASE_URL } from './apiConfig';
 import { authHeaders } from './authHeaders';
 
 const API_URL = `${API_BASE_URL}/products`;
 
-export const getAllProducts = async () =>
-  axios.get(API_URL).then((response) => response.data);
+export interface ProductQueryParams {
+  page?: number;
+  limit?: number;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  sort?: 'price-asc' | 'price-desc' | 'newest';
+}
+
+export const getAllProducts = async (params?: ProductQueryParams) =>
+  axios.get(API_URL, { params }).then((response) => response.data);
 
 export const getProductById = async (productId: string) =>
   axios.get(`${API_URL}/${productId}`).then((response) => response.data);

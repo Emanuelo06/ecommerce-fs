@@ -2,10 +2,23 @@ import axios from "axios";
 import { authHeaders } from "./authHeaders";
 import Order from "../types/Order";
 import { API_BASE_URL } from "./apiConfig";
+
 const API_URL = `${API_BASE_URL}/orders`;
 
-export const getAllOrders = async (token: string) =>
-  axios.get(API_URL, authHeaders(token)).then((res) => res.data);
+export interface OrderQueryParams {
+  page?: number;
+  limit?: number;
+  status?: "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+  minPrice?: number;
+  maxPrice?: number;
+  from?: string;
+  to?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+}
+
+export const getAllOrders = async (token: string, params?: OrderQueryParams) =>
+  axios.get(API_URL, { ...authHeaders(token), params }).then((res) => res.data);
 
 export const getOrderById = async (orderId: string, token: string) =>
   axios
