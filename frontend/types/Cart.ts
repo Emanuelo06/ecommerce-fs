@@ -1,8 +1,10 @@
 
+import Product from "./Product";
+
 interface cartItem {
-    productId: string;
+    product: Product;
     quantity: number;
-    priceSnapshot: number;
+    price: number; // Changed from priceSnapshot to match usage in components
 }
 
 interface Cart {

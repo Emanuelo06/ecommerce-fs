@@ -1,6 +1,8 @@
 import Product from "./Product"
 
 interface Order {
+    _id: string;
+    id?: string;
     products: Product[];
     userId: string;
     shippingInfo: {
@@ -10,8 +12,9 @@ interface Order {
         email: string;
     },
     totalAmount: number;
+    totalPrice: number; // Backend might return this, keeping both for compatibility
     status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
-    createdAt: Date;
+    createdAt: Date | string; // API might return string
 }
 
 export default Order;

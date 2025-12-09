@@ -20,13 +20,13 @@ export interface OrderQueryParams {
   page?: number;
   limit?: number;
   status?:
-    | "pending"
-    | "paid"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
+  | "pending"
+  | "paid"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "refunded";
   minPrice?: number;
   maxPrice?: number;
   from?: string;
@@ -55,7 +55,7 @@ const fetchOrder = (orderId: string, token: string) =>
 export const useOrdersQuery = (
   token: string,
   params?: OrderQueryParams,
-  options?: UseQueryOptions<OrderListResult, Error>
+  options?: Omit<UseQueryOptions<OrderListResult, Error>, "queryKey" | "queryFn">
 ) =>
   useQuery({
     queryKey: orderKeys.list(token, params),
@@ -77,7 +77,7 @@ export const useOrderQuery = (
   });
 
 type CreateOrderVariables = {
-  data: Order;
+  data: any; // Using any for creation payload to allow simplified structure (e.g. product IDs instead of objects)
   token: string;
 };
 
