@@ -9,28 +9,49 @@ import { ShoppingCart, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Product from "@/types/Product";
+import { useCart } from "@/context/cart-context";
 
 interface ProductInfoProps {
     product: Product;
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-    const [selectedSize, setSelectedSize] = useState("M");
-    const [selectedColor, setSelectedColor] = useState("Black");
+    // Initialize with first values of each attribute if available
+    const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>(() => {
+        const initial: Record<string, string> = {};
+        product.attributes?.forEach(attr => {
+            if (attr.values.length > 0) {
+                initial[attr.name] = attr.values[0];
+            }
+        });
+        return initial;
+    });
+
+    const [quantity, setQuantity] = useState(1);
+
+    // Find selected variant
+    const selectedVariant = product.variants?.find(v =>
+        product.attributes?.every(attr =>
+            v.attributes?.[attr.name] === selectedAttributes[attr.name]
+        )
+    );
+
+    const currentPrice = selectedVariant ? selectedVariant.price : product.price;
+    const currentStock = selectedVariant ? selectedVariant.stock : product.stock;
+    const isOutOfStock = currentStock <= 0;
+
+    const handleAttributeChange = (name: string, value: string) => {
+        setSelectedAttributes(prev => ({ ...prev, [name]: value }));
+    };
+
+    const { addToCart } = useCart();
+
+    const handleAddToCart = () => {
+        addToCart(product._id, quantity, selectedAttributes);
+    };
 
     return (
         <div className="space-y-6">
-            {/* Title & Reviews - Rendered in parent, but can be kept here if we want isolation. 
-          For now, matching parent's new layout, we might remove duplication or just keep actions here.
-          Let's assume parent handles Title/Price and this handles Actions/Variants to be cleaner?
-          Actually the parent I wrote duplicates Title/Price. I should probably clean that up.
-          For this step, I will make this component receive product and render the ACTIONS and VARIANTS primarily,
-          or render everything if the design calls for it. 
-          Looking at the PDP code, I rendered Title/Price in the parent. 
-          So I should probably remove Title/Price from here or fully utilize this component.
-          Let's make this component responsible for the whole Right Side info column to avoid duplication.
-      */}
-
             <div>
                 <h1 className="text-3xl font-bold">{product.title}</h1>
                 <div className="flex items-center gap-2 mt-2">
@@ -40,11 +61,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         ))}
                     </div>
                     <span className="text-sm text-muted-foreground">(128 reviews)</span>
-                    <Badge variant="secondary" className="ml-2">{product.stock > 0 ? "In Stock" : "Out of Stock"}</Badge>
+                    <Badge variant={isOutOfStock ? "destructive" : "secondary"} className="ml-2">
+                        {isOutOfStock ? "Out of Stock" : "In Stock"}
+                    </Badge>
                 </div>
             </div>
 
-            <div className="text-4xl font-bold">${product.price.toFixed(2)}</div>
+            <div className="text-4xl font-bold">${currentPrice.toFixed(2)}</div>
 
             <p className="text-muted-foreground">
                 {product.description}
@@ -52,49 +75,33 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
             <Separator />
 
-            {/* Color Selection */}
-            <div className="space-y-3">
-                <span className="font-semibold">Color: {selectedColor}</span>
-                <div className="flex gap-2">
-                    {["Black", "Silver", "Blue"].map((color) => (
-                        <button
-                            key={color}
-                            className={cn(
-                                "w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2",
-                                selectedColor === color ? "ring-2 ring-primary border-transparent" : "border-muted"
-                            )}
-                            style={{ backgroundColor: color.toLowerCase() }}
-                            onClick={() => setSelectedColor(color)}
-                            title={color}
-                        />
-                    ))}
+            {/* Dynamic Attribute Selection */}
+            {product.attributes?.map((attr) => (
+                <div key={attr.name} className="space-y-3">
+                    <span className="font-semibold">{attr.name}: {selectedAttributes[attr.name]}</span>
+                    <div className="flex flex-wrap gap-2">
+                        {attr.values.map((value) => (
+                            <button
+                                key={value}
+                                className={cn(
+                                    "px-4 py-2 rounded-md border text-sm font-medium transition-colors",
+                                    selectedAttributes[attr.name] === value
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "bg-background hover:bg-muted text-foreground"
+                                )}
+                                onClick={() => handleAttributeChange(attr.name, value)}
+                            >
+                                {value}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
-
-            {/* Size Selection */}
-            <div className="space-y-3">
-                <span className="font-semibold">Size: {selectedSize}</span>
-                <div className="flex gap-2">
-                    {["S", "M", "L", "XL"].map((size) => (
-                        <button
-                            key={size}
-                            className={cn(
-                                "w-10 h-10 rounded-md border flex items-center justify-center text-sm font-medium transition-colors",
-                                selectedSize === size
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-background hover:bg-muted text-foreground"
-                            )}
-                            onClick={() => setSelectedSize(size)}
-                        >
-                            {size}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            ))}
 
             <div className="flex gap-4 pt-4">
-                <Button size="lg" className="flex-1">
-                    <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                <Button size="lg" className="flex-1" disabled={isOutOfStock} onClick={handleAddToCart}>
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                 </Button>
                 <Button size="icon" variant="outline">
                     <Heart className="h-5 w-5" />
@@ -103,6 +110,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     <Share2 className="h-5 w-5" />
                 </Button>
             </div>
+            {selectedVariant && (
+                <p className="text-xs text-muted-foreground">SKU: {selectedVariant.sku || "N/A"}</p>
+            )}
         </div>
     );
 }

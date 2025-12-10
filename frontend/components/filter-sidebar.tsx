@@ -167,6 +167,52 @@ export function FilterSidebar() {
                         </div>
                     </AccordionContent>
                 </AccordionItem>
+
+                {/* Attributes Filter */}
+                <AccordionItem value="attributes">
+                    <AccordionTrigger>Attributes</AccordionTrigger>
+                    <AccordionContent>
+                        <div className="space-y-4 pt-2">
+                            <div className="space-y-2">
+                                <Label className="text-sm">Color</Label>
+                                <Input
+                                    placeholder="e.g. Red, Blue"
+                                    className="h-8"
+                                    defaultValue={searchParams.get("attributes[Color]") || ""}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const val = e.currentTarget.value;
+                                            const params = new URLSearchParams(searchParams.toString());
+                                            if (val) params.set("attributes[Color]", val);
+                                            else params.delete("attributes[Color]");
+                                            params.set("page", "1");
+                                            router.push(`/products?${params.toString()}`);
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-sm">Size</Label>
+                                <Input
+                                    placeholder="e.g. S, M, L"
+                                    className="h-8"
+                                    defaultValue={searchParams.get("attributes[Size]") || ""}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            const val = e.currentTarget.value;
+                                            const params = new URLSearchParams(searchParams.toString());
+                                            if (val) params.set("attributes[Size]", val);
+                                            else params.delete("attributes[Size]");
+                                            params.set("page", "1");
+                                            router.push(`/products?${params.toString()}`);
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">Press Enter to apply filters</p>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
             </Accordion>
         </div>
     );

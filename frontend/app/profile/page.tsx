@@ -8,7 +8,7 @@ import { Loader2, ShieldCheck, User as UserIcon, MapPin, Package, Mail, Phone, L
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { EditPhoneDialog, EditAddressDialog } from "@/components/edit-profile-dialogs";
+import { EditPhoneDialog, EditAddressDialog, EditUsernameDialog, EditPasswordDialog } from "@/components/edit-profile-dialogs";
 
 export default function ProfilePage() {
     const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -88,9 +88,9 @@ export default function ProfilePage() {
                     </CardHeader>
                 </Card>
 
-                {/* Information Grid */}
-                <div className="grid gap-6 lg:grid-cols-2">
-                    {/* Contact Information */}
+                {/* Account Settings */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Username & Password */}
                     <Card>
                         <CardHeader>
                             <div className="flex items-center gap-3">
@@ -98,71 +98,78 @@ export default function ProfilePage() {
                                     <UserIcon className="h-5 w-5 text-primary" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-lg">Contact Information</CardTitle>
-                                    <CardDescription className="text-xs">Your personal details</CardDescription>
+                                    <CardTitle className="text-lg">Account Security</CardTitle>
+                                    <CardDescription className="text-xs">Update your credentials</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
                         <Separator />
-                        <CardContent className="pt-6 space-y-4">
-                            <div className="space-y-3">
-                                <div className="flex items-start justify-between py-2">
-                                    <div className="space-y-0.5">
-                                        <p className="text-sm font-medium text-muted-foreground">Username</p>
-                                        <p className="text-base font-semibold">{user.username}</p>
-                                    </div>
-                                </div>
-                                <Separator />
-                                <div className="flex items-start justify-between py-2">
-                                    <div className="space-y-0.5 flex-1">
-                                        <p className="text-sm font-medium text-muted-foreground">Email Address</p>
-                                        <p className="text-base font-semibold break-all">{user.email}</p>
-                                    </div>
-                                </div>
-                                <Separator />
-                                <div className="flex items-start justify-between py-2">
-                                    <div className="space-y-0.5">
-                                        <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
-                                        <p className="text-base font-semibold">{user.phoneNumber || "Not provided"}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="pt-4">
-                                <EditPhoneDialog currentPhone={user.phoneNumber} />
-                            </div>
+                        <CardContent className="pt-6 space-y-3">
+                            <EditUsernameDialog currentUsername={user.username} />
+                            <EditPasswordDialog />
                         </CardContent>
                     </Card>
 
-                    {/* Shipping Address */}
+                    {/* Phone Number */}
                     <Card>
                         <CardHeader>
                             <div className="flex items-center gap-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                    <MapPin className="h-5 w-5 text-primary" />
+                                    <Phone className="h-5 w-5 text-primary" />
                                 </div>
-                                <div className="flex-1">
-                                    <CardTitle className="text-lg">Shipping Address</CardTitle>
-                                    <CardDescription className="text-xs">Default delivery location</CardDescription>
+                                <div>
+                                    <CardTitle className="text-lg">Contact Information</CardTitle>
+                                    <CardDescription className="text-xs">Phone number for contact</CardDescription>
                                 </div>
                             </div>
                         </CardHeader>
                         <Separator />
                         <CardContent className="pt-6 space-y-4">
-                            {user.address ? (
+                            {user.phoneNumber ? (
                                 <div className="rounded-lg bg-muted/50 p-4">
-                                    <p className="text-sm leading-relaxed">{user.address}</p>
+                                    <p className="text-sm font-medium text-muted-foreground mb-1">Phone Number</p>
+                                    <p className="text-base font-semibold">{user.phoneNumber}</p>
                                 </div>
                             ) : (
                                 <div className="rounded-lg border-2 border-dashed p-8 text-center">
-                                    <MapPin className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
-                                    <p className="text-sm text-muted-foreground">No address saved</p>
-                                    <p className="text-xs text-muted-foreground mt-1">Add your shipping address</p>
+                                    <Phone className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
+                                    <p className="text-sm text-muted-foreground">No phone number</p>
                                 </div>
                             )}
-                            <EditAddressDialog currentAddress={user.address} />
+                            <EditPhoneDialog currentPhone={user.phoneNumber} />
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Shipping Address */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                <MapPin className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                                <CardTitle className="text-lg">Shipping Address</CardTitle>
+                                <CardDescription className="text-xs">Default delivery location</CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <Separator />
+                    <CardContent className="pt-6 space-y-4">
+                        {user.address ? (
+                            <div className="rounded-lg bg-muted/50 p-4">
+                                <p className="text-sm leading-relaxed">{user.address}</p>
+                            </div>
+                        ) : (
+                            <div className="rounded-lg border-2 border-dashed p-8 text-center">
+                                <MapPin className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
+                                <p className="text-sm text-muted-foreground">No address saved</p>
+                                <p className="text-xs text-muted-foreground mt-1">Add your shipping address</p>
+                            </div>
+                        )}
+                        <EditAddressDialog currentAddress={user.address} />
+                    </CardContent>
+                </Card>
 
                 {/* Order History */}
                 <Card>
@@ -193,8 +200,8 @@ export default function ProfilePage() {
                             </Link>
                         </div>
                     </CardContent>
-                </Card>
-            </div>
-        </div>
+                </Card >
+            </div >
+        </div >
     );
 }

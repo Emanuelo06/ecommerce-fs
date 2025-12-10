@@ -4,6 +4,11 @@ const OrderSchema = mongoose.Schema({
   products: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+      variant: {
+        name: String,
+        price: Number,
+        attributes: { type: Map, of: String }
+      },
       quantity: { type: Number, required: true, default: 1 },
     },
   ],

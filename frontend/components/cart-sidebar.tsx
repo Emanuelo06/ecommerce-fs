@@ -51,7 +51,7 @@ export function CartSidebar() {
                     ) : (
                         <div className="space-y-6">
                             {cart.items.map((item) => (
-                                <div key={item.product._id} className="flex gap-4">
+                                <div key={item._id || `${item.product._id}-${JSON.stringify(item.variant || {})}`} className="flex gap-4">
                                     <div className="relative h-20 w-20 rounded-md overflow-hidden border">
                                         <Image
                                             src={item.product.images?.[0] || "https://placehold.co/100"}
@@ -62,8 +62,17 @@ export function CartSidebar() {
                                     </div>
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div className="flex justify-between items-start">
-                                            <h4 className="font-medium line-clamp-2 leading-tight">{item.product.title}</h4>
-                                            <p className="font-bold ml-2">${(item.price * item.quantity).toFixed(2)}</p>
+                                            <div>
+                                                <h4 className="font-medium line-clamp-2 leading-tight">{item.product.title}</h4>
+                                                {item.variant && (
+                                                    <p className="text-xs text-muted-foreground mt-1">
+                                                        {item.variant.name ||
+                                                            (item.variant.attributes && Object.entries(item.variant.attributes).map(([k, v]) => `${k}: ${v}`).join(", "))
+                                                        }
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <p className="font-bold ml-2">${((item.variant?.price || item.product.price) * item.quantity).toFixed(2)}</p>
                                         </div>
                                         <div className="flex justify-between items-center text-sm text-muted-foreground">
                                             <div className="flex items-center gap-2">

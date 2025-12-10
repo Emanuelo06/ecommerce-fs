@@ -1,18 +1,18 @@
 import Product from "../db/models/Product.js"
 
 
-export const getProducts = async ()=> {
+export const getProducts = async () => {
     const products = await Product.find()
-    if(products.length === 0){
-     throw new Error("No products Available")
+    if (products.length === 0) {
+        throw new Error("No products Available")
     }
     return products
 }
 export const getProduct = async (productId) => {
     const product = await Product.findById(productId)
-    if(!product){
+    if (!product) {
         throw new Error("Product not found")
-    }   
+    }
     return product
 }
 
@@ -38,49 +38,70 @@ export const deleteProduct = async (productId) => {
 }
 
 export const queryProduct = async (query) => {
-    
+
     const page = Math.max(1, Number(query.page) || 1);
     const maxLimit = 100;
     const defaultLimit = 20;
     const limit = Math.min(maxLimit, Math.max(1, Number(query.limit) || defaultLimit));
-    const skip = (page -1) * limit;
+    const skip = (page - 1) * limit;
 
     const filters = {}
-    if(query.category){
+    if (query.category) {
         filters.category = query.category
     }
-    if(query.minPrice || query.maxPrice){
+    if (query.minPrice || query.maxPrice) {
         filters.price = {};
-        if(query.minPrice) filters.price.$gte = Number(query.minPrice);
-        if(query.maxPrice) filters.price.$lte = Number(query.maxPrice);
+        if (query.minPrice) filters.price.$gte = Number(query.minPrice);
+        if (query.maxPrice) filters.price.$lte = Number(query.maxPrice);
     }
 
-    if(query.search){
+    if (query.search) {
         filters.$or = [
-            {title: {$regex: query.search, $options: "i"}},
-            {description: {$regex: query.search, $options: "i"}},
+            { title: { $regex: query.search, $options: "i" } },
+            { description: { $regex: query.search, $options: "i" } },
         ];
     }
 
+    // Attribute Filtering
+    // usage: ?attributes[Color]=Red&attributes[Size]=M
+    if (query.attributes) {
+        const attributeFilters = Object.entries(query.attributes).map(([key, value]) => ({
+            attributes: {
+                $elemMatch: {
+                    name: key,
+                    values: value
+                }
+            }
+        }));
+
+        if (attributeFilters.length > 0) {
+            if (filters.$and) {
+                filters.$and.push(...attributeFilters);
+            } else {
+                filters.$and = attributeFilters;
+            }
+        }
+    }
+
     let sort = {}
-    switch(query.sort){
+    switch (query.sort) {
         case "price-asc":
-            sort = {price: 1};
+            sort = { price: 1 };
             break;
         case "price-desc":
-            sort = {price : -1};
+            sort = { price: -1 };
             break;
         case "newest":
-            sort = {createdAt : -1};
+            sort = { createdAt: -1 };
             break;
         default:
-            sort = {createdAt : -1};
+            sort = { createdAt: -1 };
     }
 
     const products = await Product.find(filters)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
 
     const total = await Product.countDocuments(filters);
 
@@ -88,7 +109,7 @@ export const queryProduct = async (query) => {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total/limit),
+        totalPages: Math.ceil(total / limit),
         results: products.length,
         products
     };

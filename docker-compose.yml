@@ -10,6 +10,15 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./backend/package.json
 
   frontend:
     build: ./frontend
@@ -24,3 +33,13 @@ services:
     environment:
       - NODE_ENV=development
       - WATCHPACK_POLLING=true
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+            - .next/
+        - action: rebuild
+          path: ./frontend/package.json

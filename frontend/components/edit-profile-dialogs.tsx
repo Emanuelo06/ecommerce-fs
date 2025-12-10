@@ -82,17 +82,7 @@ export function EditPhoneDialog({ currentPhone }: EditPhoneDialogProps) {
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const formatted = formatPhoneNumber(e.target.value, countryCode);
-        setPhone(formatted);
-    };
-
-    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newCode = e.target.value;
-        setCountryCode(newCode);
-        // Reformat existing number with new country code
-        if (phone) {
-            setPhone(formatPhoneNumber(phone, newCode));
-        }
+        setPhone(e.target.value);
     };
 
     const handleSave = () => {
@@ -149,28 +139,24 @@ export function EditPhoneDialog({ currentPhone }: EditPhoneDialogProps) {
                             Mobile Phone Number
                         </Label>
                         <div className="flex gap-2">
-                            <select
+                            <Input
+                                type="text"
+                                placeholder="+1"
                                 value={countryCode}
-                                onChange={handleCountryChange}
-                                className="flex h-10 w-[140px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                            >
-                                {COUNTRY_CODES.map((country) => (
-                                    <option key={country.code} value={country.code}>
-                                        {country.flag} {country.code}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={(e) => setCountryCode(e.target.value)}
+                                className="w-20 text-base"
+                            />
                             <Input
                                 id="phone"
                                 type="tel"
-                                placeholder={COUNTRY_CODES.find(c => c.code === countryCode)?.format || "(555) 123-4567"}
+                                placeholder="555 123 4567"
                                 value={phone}
                                 onChange={handlePhoneChange}
                                 className="flex-1 text-base"
                             />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            We'll use this number to contact you about orders
+                            Enter country code (e.g., +1, +44, +39) and your number
                         </p>
                     </div>
                 </div>
@@ -355,6 +341,201 @@ export function EditAddressDialog({ currentAddress }: EditAddressDialogProps) {
                     <Button onClick={handleSave} disabled={isPending} className="sm:flex-1">
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Save Address
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+interface EditUsernameDialogProps {
+    currentUsername: string;
+}
+
+export function EditUsernameDialog({ currentUsername }: EditUsernameDialogProps) {
+    const [open, setOpen] = useState(false);
+    const [username, setUsername] = useState(currentUsername);
+    const { user, token, updateUserData } = useAuth();
+    const { mutate: updateUser, isPending } = useUpdateUserMutation();
+
+    const handleSave = () => {
+        if (!user || !token) return;
+
+        if (!username || username.length < 3) {
+            toast.error("Username must be at least 3 characters");
+            return;
+        }
+
+        updateUser(
+            {
+                userId: user._id,
+                data: { username },
+                token,
+            },
+            {
+                onSuccess: (updatedUser) => {
+                    updateUserData(updatedUser);
+                    toast.success("Username updated successfully");
+                    setOpen(false);
+                },
+                onError: (error: any) => {
+                    toast.error("Failed to update username", {
+                        description: error?.response?.data?.message || error.message,
+                    });
+                },
+            }
+        );
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="secondary" className="w-full">
+                    Edit Username
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Change Username</DialogTitle>
+                    <DialogDescription>
+                        Choose a new username for your account
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="username" className="text-sm font-medium">
+                            Username <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="username"
+                            placeholder="Enter new username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="text-base"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            At least 3 characters
+                        </p>
+                    </div>
+                </div>
+                <DialogFooter className="sm:justify-between">
+                    <Button
+                        variant="outline"
+                        onClick={() => setOpen(false)}
+                        disabled={isPending}
+                        className="sm:flex-1"
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSave} disabled={isPending} className="sm:flex-1">
+                        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save Username
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export function EditPasswordDialog() {
+    const [open, setOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const { user, token } = useAuth();
+    const { mutate: updateUser, isPending } = useUpdateUserMutation();
+
+    const handleSave = () => {
+        if (!user || !token) return;
+
+        if (!newPassword || newPassword.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+
+        updateUser(
+            {
+                userId: user._id,
+                data: { password: newPassword },
+                token,
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Password updated successfully");
+                    setOpen(false);
+                    setNewPassword("");
+                    setConfirmPassword("");
+                },
+                onError: (error: any) => {
+                    toast.error("Failed to update password", {
+                        description: error?.response?.data?.message || error.message,
+                    });
+                },
+            }
+        );
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="secondary" className="w-full">
+                    Change Password
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Change Password</DialogTitle>
+                    <DialogDescription>
+                        Enter a new password for your account
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="newPassword" className="text-sm font-medium">
+                            New Password <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="newPassword"
+                            type="password"
+                            placeholder="Enter new password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="text-base"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                            Confirm Password <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                            id="confirmPassword"
+                            type="password"
+                            placeholder="Confirm new password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="text-base"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            At least 6 characters
+                        </p>
+                    </div>
+                </div>
+                <DialogFooter className="sm:justify-between">
+                    <Button
+                        variant="outline"
+                        onClick={() => setOpen(false)}
+                        disabled={isPending}
+                        className="sm:flex-1"
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSave} disabled={isPending} className="sm:flex-1">
+                        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Change Password
                     </Button>
                 </DialogFooter>
             </DialogContent>

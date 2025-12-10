@@ -33,6 +33,7 @@ export const useCartQuery = (
 type CartItemPayload = {
   productId: string;
   quantity: number;
+  attributes?: Record<string, string>;
 };
 
 type TokenVariables = { token: string };

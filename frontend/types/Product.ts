@@ -8,6 +8,17 @@ interface Product {
     category: string;
     stock: number;
     images: string[];
+    attributes?: {
+        name: string;
+        values: string[];
+    }[];
+    variants?: {
+        name: string;
+        price: number;
+        stock: number;
+        attributes: Record<string, string>;
+        sku?: string;
+    }[];
     createdAt: Date;
 }
 

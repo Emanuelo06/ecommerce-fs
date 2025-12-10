@@ -22,7 +22,8 @@ export interface ProductQueryParams {
   minPrice?: number;
   maxPrice?: number;
   search?: string;
-  sort?: "price-asc" | "price-desc" | "newest";
+  sort?: string;
+  attributes?: Record<string, string>;
 }
 
 type ProductListResult = ProductListResponse<Product>;

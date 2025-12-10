@@ -14,7 +14,7 @@ import Cart from "@/types/Cart";
 interface CartContextType {
     cart: Cart | null;
     isLoading: boolean;
-    addToCart: (productId: string, quantity: number) => void;
+    addToCart: (productId: string, quantity: number, attributes?: Record<string, string>) => void;
     removeFromCart: (productId: string) => void;
     updateQuantity: (productId: string, quantity: number) => void;
     itemsCount: number;
@@ -32,13 +32,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const { mutate: removeItem } = useRemoveCartItemMutation();
     const { mutate: updateItem } = useUpdateCartItemMutation();
 
-    const addToCart = (productId: string, quantity: number) => {
+    const addToCart = (productId: string, quantity: number, attributes?: Record<string, string>) => {
         if (!isAuthenticated || !token) {
             toast.error("Please login to add items to cart");
             return;
         }
         addItem(
-            { productId, quantity, token },
+            { productId, quantity, attributes, token },
             {
                 onSuccess: () => toast.success("Added to cart"),
                 onError: () => toast.error("Failed to add to cart"),

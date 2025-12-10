@@ -17,12 +17,22 @@ function ProductsContent() {
     const search = searchParams.get("search") || undefined;
     const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
 
+    // Parse attributes
+    const attributes: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+        if (key.startsWith("attributes[")) {
+            const attrKey = key.slice(11, -1);
+            attributes[attrKey] = value;
+        }
+    });
+
     const queryParams: ProductQueryParams = {
         limit: 12,
         page,
         category,
         maxPrice,
-        search
+        search,
+        attributes: Object.keys(attributes).length > 0 ? attributes : undefined
     };
 
     const { data, isLoading, error } = useProductsQuery(queryParams);
