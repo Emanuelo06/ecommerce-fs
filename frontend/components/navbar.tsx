@@ -55,8 +55,15 @@ const Navbar = () => {
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <NavigationMenuLink asChild>
-                                    <Link href="/products" className={navigationMenuTriggerStyle()}>
-                                        Categories
+                                    <Link href="/about" className={navigationMenuTriggerStyle()}>
+                                        About
+                                    </Link>
+                                </NavigationMenuLink>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                <NavigationMenuLink asChild>
+                                    <Link href="/contact" className={navigationMenuTriggerStyle()}>
+                                        Contact
                                     </Link>
                                 </NavigationMenuLink>
                             </NavigationMenuItem>
@@ -100,8 +107,11 @@ const Navbar = () => {
                                 <Link href="/products" className="text-lg font-medium hover:text-primary transition-colors">
                                     Products
                                 </Link>
-                                <Link href="/products" className="text-lg font-medium hover:text-primary transition-colors">
-                                    Categories
+                                <Link href="/about" className="text-lg font-medium hover:text-primary transition-colors">
+                                    About
+                                </Link>
+                                <Link href="/contact" className="text-lg font-medium hover:text-primary transition-colors">
+                                    Contact
                                 </Link>
                                 <Link href="/products?category=Smartphones" className="text-lg font-medium hover:text-primary transition-colors">
                                     Phones

@@ -101,7 +101,7 @@ export function CartSidebar() {
                     )}
                 </div>
 
-                <div className="border-t pt-6">
+                <div className="border-t pt-6 mt-6">
                     <div className="flex justify-between text-lg font-semibold mb-6">
                         <span>Total</span>
                         <span>${total.toFixed(2)}</span>

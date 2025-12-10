@@ -4,11 +4,23 @@ services:
     ports:
       - "5000:5000"
     env_file:
-      - /backend/.env
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     env_file:
-      - /frontend/.env
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true

@@ -3,10 +3,12 @@
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ShieldCheck, User as UserIcon, MapPin, Package } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, ShieldCheck, User as UserIcon, MapPin, Package, Mail, Phone, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { EditPhoneDialog, EditAddressDialog } from "@/components/edit-profile-dialogs";
 
 export default function ProfilePage() {
     const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -20,7 +22,7 @@ export default function ProfilePage() {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center p-8">
+            <div className="flex justify-center items-center min-h-[60vh]">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
@@ -28,99 +30,168 @@ export default function ProfilePage() {
 
     if (!user) {
         return (
-            <div className="flex justify-center p-8">
+            <div className="flex justify-center items-center min-h-[60vh]">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
 
     return (
-        <div className="container max-w-4xl py-10 space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">User Settings</h1>
-                    <p className="text-muted-foreground">
-                        Manage your account settings and preferences.
-                    </p>
-                </div>
-                {user.role === "admin" && (
-                    <Link href="/admin">
-                        <Button className="gap-2">
-                            <ShieldCheck className="h-4 w-4" />
-                            Admin Dashboard
-                        </Button>
-                    </Link>
-                )}
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* User Profile Card */}
-                <Card>
-                    <CardHeader className="flex flex-row items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                            <UserIcon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="grid gap-1">
-                            <CardTitle>Personal Information</CardTitle>
-                            <CardDescription>Your contact details</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-sm">
-                        <div className="grid gap-1">
-                            <span className="font-medium">Username</span>
-                            <span className="text-muted-foreground">{user.username}</span>
-                        </div>
-                        <div className="grid gap-1">
-                            <span className="font-medium">Email</span>
-                            <span className="text-muted-foreground">{user.email}</span>
-                        </div>
-                        <div className="grid gap-1">
-                            <span className="font-medium">Account Type</span>
-                            <span className="capitalize text-muted-foreground">{user.role}</span>
-                        </div>
-                        <Button variant="outline" className="w-full mt-2" onClick={logout}>
-                            Log out
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                {/* Addresses Card Placeholder */}
-                <Card>
-                    <CardHeader className="flex flex-row items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                            <MapPin className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="grid gap-1">
-                            <CardTitle>Address Book</CardTitle>
-                            <CardDescription>Manage your shipping addresses</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-sm">
-                        <p className="text-muted-foreground">
-                            {user.address || "No address saved."}
+        <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+            <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 space-y-8">
+                {/* Header Section */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Profile</h1>
+                        <p className="text-sm md:text-base text-muted-foreground">
+                            Manage your account settings and view your activity
                         </p>
-                        <Button variant="secondary" className="w-full">Edit Address</Button>
-                    </CardContent>
-                </Card>
-
-                {/* Orders Card Placeholder */}
-                <Card className="md:col-span-2">
-                    <CardHeader className="flex flex-row items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                            <Package className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="grid gap-1">
-                            <CardTitle>Order History</CardTitle>
-                            <CardDescription>View your recent orders</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground text-center py-8">
-                            No orders found.
-                        </p>
-                        <Link href="/products" className="block text-center">
-                            <Button variant="link">Start Shopping</Button>
+                    </div>
+                    {user.role === "admin" && (
+                        <Link href="/admin" className="w-full sm:w-auto">
+                            <Button className="gap-2 w-full sm:w-auto">
+                                <ShieldCheck className="h-4 w-4" />
+                                <span>Admin Dashboard</span>
+                            </Button>
                         </Link>
+                    )}
+                </div>
+
+                {/* Profile Overview Card */}
+                <Card className="border-2">
+                    <CardHeader className="pb-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div className="flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-primary/10 ring-4 ring-primary/5">
+                                <UserIcon className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <CardTitle className="text-xl md:text-2xl">{user.username}</CardTitle>
+                                <CardDescription className="text-sm md:text-base flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    {user.email}
+                                </CardDescription>
+                                <div className="flex items-center gap-2 pt-1">
+                                    <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary capitalize">
+                                        {user.role}
+                                    </span>
+                                </div>
+                            </div>
+                            <Button
+                                variant="outline"
+                                className="gap-2 w-full sm:w-auto mt-2 sm:mt-0"
+                                onClick={logout}
+                            >
+                                <LogOut className="h-4 w-4" />
+                                <span>Logout</span>
+                            </Button>
+                        </div>
+                    </CardHeader>
+                </Card>
+
+                {/* Information Grid */}
+                <div className="grid gap-6 lg:grid-cols-2">
+                    {/* Contact Information */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                    <UserIcon className="h-5 w-5 text-primary" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg">Contact Information</CardTitle>
+                                    <CardDescription className="text-xs">Your personal details</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <Separator />
+                        <CardContent className="pt-6 space-y-4">
+                            <div className="space-y-3">
+                                <div className="flex items-start justify-between py-2">
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-medium text-muted-foreground">Username</p>
+                                        <p className="text-base font-semibold">{user.username}</p>
+                                    </div>
+                                </div>
+                                <Separator />
+                                <div className="flex items-start justify-between py-2">
+                                    <div className="space-y-0.5 flex-1">
+                                        <p className="text-sm font-medium text-muted-foreground">Email Address</p>
+                                        <p className="text-base font-semibold break-all">{user.email}</p>
+                                    </div>
+                                </div>
+                                <Separator />
+                                <div className="flex items-start justify-between py-2">
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
+                                        <p className="text-base font-semibold">{user.phoneNumber || "Not provided"}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="pt-4">
+                                <EditPhoneDialog currentPhone={user.phoneNumber} />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Shipping Address */}
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                    <MapPin className="h-5 w-5 text-primary" />
+                                </div>
+                                <div className="flex-1">
+                                    <CardTitle className="text-lg">Shipping Address</CardTitle>
+                                    <CardDescription className="text-xs">Default delivery location</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <Separator />
+                        <CardContent className="pt-6 space-y-4">
+                            {user.address ? (
+                                <div className="rounded-lg bg-muted/50 p-4">
+                                    <p className="text-sm leading-relaxed">{user.address}</p>
+                                </div>
+                            ) : (
+                                <div className="rounded-lg border-2 border-dashed p-8 text-center">
+                                    <MapPin className="mx-auto h-8 w-8 text-muted-foreground/50 mb-2" />
+                                    <p className="text-sm text-muted-foreground">No address saved</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Add your shipping address</p>
+                                </div>
+                            )}
+                            <EditAddressDialog currentAddress={user.address} />
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Order History */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                <Package className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-lg">Order History</CardTitle>
+                                <CardDescription className="text-xs">Track your recent purchases</CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <Separator />
+                    <CardContent className="pt-6">
+                        <div className="rounded-lg border-2 border-dashed p-8 md:p-12 text-center">
+                            <Package className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
+                            <p className="text-base font-medium mb-1">No orders yet</p>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Start shopping to see your order history here
+                            </p>
+                            <Link href="/products">
+                                <Button className="gap-2">
+                                    <Package className="h-4 w-4" />
+                                    Browse Products
+                                </Button>
+                            </Link>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

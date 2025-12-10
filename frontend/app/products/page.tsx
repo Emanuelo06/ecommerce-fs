@@ -6,8 +6,9 @@ import { useProductsQuery } from "@/services/productQueries";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { ProductQueryParams } from "@/services/productQueries";
+import { Suspense } from "react";
 
-export default function ProductsPage() {
+function ProductsContent() {
     const searchParams = useSearchParams();
 
     // Parse params
@@ -79,5 +80,17 @@ export default function ProductsPage() {
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <ProductsContent />
+        </Suspense>
     );
 }

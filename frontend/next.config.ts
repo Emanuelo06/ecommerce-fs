@@ -5,14 +5,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "placehold.co",
+        hostname: "**",
       },
     ],
   },
+  // Enable Turbopack (Next.js 16 default)
+  // Hot reload handled by WATCHPACK_POLLING env var in docker-compose
+  turbopack: {},
 };
 
 export default nextConfig;

@@ -3,6 +3,7 @@
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
     Accordion,
     AccordionContent,
@@ -11,19 +12,15 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-// Removed unused imports
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 const CATEGORIES = ["Laptops", "Smartphones", "Accessories", "Audio", "Tablets", "Wearables"];
-// const BRANDS = ["Apple", "Samsung", "Sony", "Dell", "Logitech"]; // Backend doesn't support brand filter explicitly yet in generic query, but we can add if needed. 
-// Checking productQueries.ts -> supports page, limit, category, minPrice, maxPrice, search, sort. 
-// No Brand. I will comment out Brand for now to be "production ready" with what works.
 
 export function FilterSidebar() {
     const router = useRouter();
     const searchParams = useSearchParams();
-
-    // State to manage local UI before applying (optional, for immediate feedback usually we sync URL directly)
-    // We will sync directly for simplicity.
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
 
     const handleCategoryChange = (category: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -32,22 +29,39 @@ export function FilterSidebar() {
         } else {
             params.set("category", category);
         }
-        params.set("page", "1"); // Reset page on filter change
+        params.set("page", "1");
         router.push(`/products?${params.toString()}`);
     };
 
-    const handlePriceChange = (value: number[]) => {
+    const handleSearch = () => {
         const params = new URLSearchParams(searchParams.toString());
-        params.set("maxPrice", value[0].toString());
+        if (searchQuery.trim()) {
+            params.set("search", searchQuery.trim());
+        } else {
+            params.delete("search");
+        }
+        params.set("page", "1");
+        router.push(`/products?${params.toString()}`);
+    };
+
+    const handlePriceChange = (value: number[], isMin: boolean = false) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (isMin) {
+            params.set("minPrice", value[0].toString());
+        } else {
+            params.set("maxPrice", value[0].toString());
+        }
         params.set("page", "1");
         router.push(`/products?${params.toString()}`);
     };
 
     const handleReset = () => {
+        setSearchQuery("");
         router.push("/products");
     };
 
     const currentCategory = searchParams.get("category");
+    const currentMinPrice = searchParams.get("minPrice") ? parseInt(searchParams.get("minPrice")!) : 0;
     const currentMaxPrice = searchParams.get("maxPrice") ? parseInt(searchParams.get("maxPrice")!) : 2000;
 
     return (
@@ -59,7 +73,30 @@ export function FilterSidebar() {
                 </Button>
             </div>
 
-            <Accordion type="single" collapsible defaultValue="category" className="w-full">
+            {/* Search Bar */}
+            <div className="space-y-2">
+                <Label htmlFor="search" className="text-sm font-medium">Search Products</Label>
+                <div className="flex gap-2">
+                    <Input
+                        id="search"
+                        type="text"
+                        placeholder="Search..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearch();
+                            }
+                        }}
+                        className="flex-1"
+                    />
+                    <Button size="icon" onClick={handleSearch}>
+                        <Search className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+
+            <Accordion type="multiple" defaultValue={["category", "price"]} className="w-full">
                 {/* Category Filter */}
                 <AccordionItem value="category">
                     <AccordionTrigger>Categories</AccordionTrigger>
@@ -93,19 +130,39 @@ export function FilterSidebar() {
 
                 {/* Price Filter */}
                 <AccordionItem value="price">
-                    <AccordionTrigger>Max Price</AccordionTrigger>
+                    <AccordionTrigger>Price Range</AccordionTrigger>
                     <AccordionContent>
-                        <div className="pt-4 pb-2 px-2">
-                            <Slider
-                                defaultValue={[currentMaxPrice]}
-                                max={3000}
-                                step={50}
-                                className="w-full"
-                                onValueCommit={handlePriceChange}
-                            />
-                            <div className="flex justify-between mt-4 text-sm text-muted-foreground">
-                                <span>$0</span>
-                                <span>${currentMaxPrice}+</span>
+                        <div className="space-y-6">
+                            {/* Min Price */}
+                            <div className="pt-4 pb-2 px-2">
+                                <Label className="text-sm mb-2 block">Minimum Price</Label>
+                                <Slider
+                                    defaultValue={[currentMinPrice]}
+                                    max={2000}
+                                    step={50}
+                                    className="w-full"
+                                    onValueCommit={(value) => handlePriceChange(value, true)}
+                                />
+                                <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                                    <span>$0</span>
+                                    <span>${currentMinPrice}</span>
+                                </div>
+                            </div>
+
+                            {/* Max Price */}
+                            <div className="pb-2 px-2">
+                                <Label className="text-sm mb-2 block">Maximum Price</Label>
+                                <Slider
+                                    defaultValue={[currentMaxPrice]}
+                                    max={3000}
+                                    step={50}
+                                    className="w-full"
+                                    onValueCommit={(value) => handlePriceChange(value, false)}
+                                />
+                                <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                                    <span>$0</span>
+                                    <span>${currentMaxPrice}+</span>
+                                </div>
                             </div>
                         </div>
                     </AccordionContent>
